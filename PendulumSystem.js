@@ -25,6 +25,7 @@ class PendulumSystem {
 
         const queryString = window.location.search;
         const urlParams = new URLSearchParams(queryString);
+        console.log("DEBUG!!");
         console.log(queryString);
         console.log(urlParams);
 
