@@ -8,6 +8,7 @@ class PendulumSystem {
         this.longestToShortestRatio = longestToShortestRatio
         this.knobRadius = knobRadius;
         this.dingSound = dingSound;
+        this.started = false;
 
         this.radius = Math.min(window.innerWidth, window.innerHeight) / 2.5;
         this.minPendulumLength = this.radius / 10;
@@ -18,16 +19,60 @@ class PendulumSystem {
         this.pendulums = [];
     }
 
+    static genRandomSystem(dingSound) {
+        let randSystem;
+        let generationComplete = false;
+
+        while (!generationComplete) {
+            const angle = Math.max(Math.random() * 360, 90.0);
+            const cycleLength = Math.round(Math.max(Math.random() * 30, 0.25) * 60 * 1000);
+
+            let cycleLengthDelimiters = [];
+            const minShortestRotationLength = 1 * 1000;
+            const maxShortestRotationLength = 10 * 1000;
+            for (let i = 2; i < Math.floor(Math.sqrt(cycleLength)); i++) {
+                if (cycleLength % i == 0) {
+                    if (minShortestRotationLength <= i && i <= maxShortestRotationLength)
+                        cycleLengthDelimiters.push(i);
+                    if (minShortestRotationLength <= (cycleLength / i) && (cycleLength / i) <= maxShortestRotationLength)
+                        cycleLengthDelimiters.push(cycleLength / i);
+                }
+            }
+            const shortestRotationLength = cycleLengthDelimiters[Math.floor(Math.random() * cycleLengthDelimiters.length)];
+            const longestToShortestRatio = Math.random() * 9 + 1;
+            const knobRadius = Math.ceil(Math.random() * 12) + 3;
+
+            randSystem = new PendulumSystem(
+                angle, 
+                cycleLength, 
+                shortestRotationLength, 
+                longestToShortestRatio, 
+                knobRadius, 
+                dingSound
+            );
+            randSystem.setupSystem();
+
+            if (randSystem.pendulums.length > 5 && randSystem.pendulums.length <= 50)
+                generationComplete = true;
+        }
+
+        return randSystem;
+    }
+
     calcAngles() {
         const angleOffset = -radians(this.angle / 2) + radians(90);
         this.startAngle = angleOffset;
         this.endAngle = radians(this.angle) + angleOffset;
     }
 
-    start() {
-        this.startTime = Date.now();
+    setupSystem() {
         this.calcAngles();
         this.genPendulums();
+    }
+
+    start() {
+        this.startTime = Date.now();
+        this.started = true;
     }
 
     genPendulums() {
@@ -35,8 +80,11 @@ class PendulumSystem {
         let longestRotationCycles = Math.round(shortestRotationCycles / this.longestToShortestRatio);
         longestRotationCycles += longestRotationCycles % 2
 
+        const maxPossiblePendulums = (shortestRotationCycles - longestRotationCycles) / 2;
+        const cyclesStep = Math.max(Math.floor(maxPossiblePendulums / 50) * 2, 2);
+        
         this.pendulums = [];
-        for (let cyclesAmount = longestRotationCycles; cyclesAmount <= shortestRotationCycles; cyclesAmount += 2) {
+        for (let cyclesAmount = longestRotationCycles; cyclesAmount <= shortestRotationCycles; cyclesAmount += cyclesStep) {
             const timePerCycle = this.cycleLength / cyclesAmount;
             const p = new Pendulum(
                 this.radius, 
@@ -71,6 +119,9 @@ class PendulumSystem {
     }
 
     update() {
+        if (!this.started)
+            return;
+
         this.updateTime();
 
         for (let i = 0; i < this.pendulums.length; ++i) {
