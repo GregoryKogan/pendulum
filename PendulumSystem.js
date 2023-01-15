@@ -23,24 +23,45 @@ class PendulumSystem {
         let randSystem;
         let generationComplete = false;
 
-        while (!generationComplete) {
-            const angle = Math.max(Math.random() * 360, 90.0);
-            const cycleLength = Math.round(Math.max(Math.random() * 30, 0.25) * 60 * 1000);
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
 
-            let cycleLengthDelimiters = [];
-            const minShortestRotationLength = 1 * 1000;
-            const maxShortestRotationLength = 10 * 1000;
-            for (let i = 2; i < Math.floor(Math.sqrt(cycleLength)); i++) {
-                if (cycleLength % i == 0) {
-                    if (minShortestRotationLength <= i && i <= maxShortestRotationLength)
-                        cycleLengthDelimiters.push(i);
-                    if (minShortestRotationLength <= (cycleLength / i) && (cycleLength / i) <= maxShortestRotationLength)
-                        cycleLengthDelimiters.push(cycleLength / i);
+        while (!generationComplete) {
+            let angle = urlParams.get('angle');
+            if (!angle)
+                angle = Math.max(Math.random() * 360, 90.0);
+            
+            let cycleLength;
+            if (urlParams.get('cycle'))
+                cycleLength = urlParams.get('cycle') * 60 * 1000;
+            else
+                cycleLength = Math.round(Math.max(Math.random() * 30, 0.25) * 60 * 1000);
+
+            let shortestRotationLength;
+            if (urlParams.get('short'))
+                shortestRotationLength = urlParams.get('short') * 1000;
+            else {
+                let cycleLengthDelimiters = [];
+                const minShortestRotationLength = 1 * 1000;
+                const maxShortestRotationLength = 10 * 1000;
+                for (let i = 2; i < Math.floor(Math.sqrt(cycleLength)); i++) {
+                    if (cycleLength % i == 0) {
+                        if (minShortestRotationLength <= i && i <= maxShortestRotationLength)
+                            cycleLengthDelimiters.push(i);
+                        if (minShortestRotationLength <= (cycleLength / i) && (cycleLength / i) <= maxShortestRotationLength)
+                            cycleLengthDelimiters.push(cycleLength / i);
+                    }
                 }
+                shortestRotationLength = cycleLengthDelimiters[Math.floor(Math.random() * cycleLengthDelimiters.length)];
             }
-            const shortestRotationLength = cycleLengthDelimiters[Math.floor(Math.random() * cycleLengthDelimiters.length)];
-            const longestToShortestRatio = Math.random() * 9 + 1;
-            const knobRadius = Math.ceil(Math.random() * 12) + 3;
+
+            let longestToShortestRatio = urlParams.get('ratio');
+            if (!longestToShortestRatio)
+                longestToShortestRatio = Math.random() * 9 + 1;
+
+            let knobRadius = parseInt(urlParams.get('knob'));
+            if (!knobRadius)
+                knobRadius = Math.ceil(Math.random() * 12) + 3;
 
             randSystem = new PendulumSystem(
                 angle, 

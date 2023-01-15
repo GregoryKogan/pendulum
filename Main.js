@@ -12,6 +12,10 @@ function preload() {
 
 
 function setup() {
+    // const queryString = window.location.search;
+    // const urlParams = new URLSearchParams(queryString);
+    // console.log(urlParams.get('cum'));
+
     createCanvas(window.innerWidth, window.innerHeight);
     SetUpUI();
     frameRate(60);
