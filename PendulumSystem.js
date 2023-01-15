@@ -25,6 +25,8 @@ class PendulumSystem {
 
         const queryString = window.location.search;
         const urlParams = new URLSearchParams(queryString);
+        console.log(queryString);
+        console.log(urlParams);
 
         while (!generationComplete) {
             let angle = urlParams.get('angle');
