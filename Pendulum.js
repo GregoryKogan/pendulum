@@ -10,18 +10,14 @@ class Pendulum {
         this.dingSound = dingSound;
         this.soundRate = 1
 
-        const offset = Math.abs(Math.asin(this.knobRadius / this.length));
-        this.startAngle = areaStartAngle + offset;
-        this.endAngle = areaEndAngle - offset;
-
         this.rotationProgress = 0;
         this.direction = "counterclockwise";
     }
 
-    calcAngles() {
+    calcAngles(areaStartAngle, areaEndAngle) {
         const offset = Math.abs(Math.asin(this.knobRadius / this.length));
-        this.startAngle = this.areaStartAngle + offset;
-        this.endAngle = this.areaEndAngle - offset;
+        this.startAngle = areaStartAngle + offset;
+        this.endAngle = areaEndAngle - offset;
     }
 
     update(dt) {

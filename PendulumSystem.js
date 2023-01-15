@@ -9,7 +9,7 @@ class PendulumSystem {
         this.knobRadius = knobRadius;
         this.dingSound = dingSound;
 
-        this.radius = Math.min(window.innerWidth, window.innerHeight) / 4;
+        this.radius = Math.min(window.innerWidth, window.innerHeight) / 2.5;
         this.minPendulumLength = this.radius / 10;
 
         this.startTime = 0;
@@ -51,10 +51,10 @@ class PendulumSystem {
 
         const colorFrom = color("#8be9fd");
         const colorTo = color("#ff79c6");
-        const step = (this.radius - this.minPendulumLength - this.knobRadius * 2 - 5) / (this.pendulums.length - 1);
         const useSound = this.pendulums.length > 50 ? false : true;
         for (let i = 0; i < this.pendulums.length; i++) {
-            this.pendulums[i].length = this.minPendulumLength + this.knobRadius + ((this.pendulums.length - i - 1) * step);
+            this.pendulums[i].length = map(i, this.pendulums.length - 1, 0, this.minPendulumLength + this.knobRadius, this.radius - this.knobRadius - 5);
+            this.pendulums[i].calcAngles(this.startAngle, this.endAngle);
             this.pendulums[i].color = lerpColor(colorTo, colorFrom, i / (this.pendulums.length - 1));
             this.pendulums[i].useSound = useSound;
             this.pendulums[i].soundRate = map(i, 0, this.pendulums.length - 1, 0.25, 3.0);
@@ -79,6 +79,9 @@ class PendulumSystem {
     }
 
     render() {
+        for (let i = 0; i < this.pendulums.length; ++i) {
+            this.pendulums[i].render(window.innerWidth / 2, window.innerHeight / 2);
+        }
         noFill();
         stroke("#f8f8f2");
         strokeWeight(2);
@@ -91,9 +94,5 @@ class PendulumSystem {
             this.endAngle,
             PIE
         );
-
-        for (let i = 0; i < this.pendulums.length; ++i) {
-            this.pendulums[i].render(window.innerWidth / 2, window.innerHeight / 2);
-        }
     }
 }
